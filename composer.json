@@ -1,0 +1,10 @@
+{
+    "autoload" : {
+        "psr-4" : {
+            "Wlog\\": "Core/"
+        } 
+    },
+    "require": {
+        "illuminate/database": "^10.48"
+    }
+}
