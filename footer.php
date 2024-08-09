@@ -1,7 +1,7 @@
 <div class="blog_copyright_wrapper">
     <div class="container">
         <div style="text-align: center">
-            <p>کپی رایت &copy; 1403 <a href="index.html">Wlog</a>. تمامی حقوق محفوظ است.</p>
+            <p>کپی رایت &copy; 1403 <a href="https://github.com/Amirhossein-Zangali/Wlog">Wlog</a>. تمامی حقوق محفوظ است.</p>
         </div>
     </div>
 </div>
