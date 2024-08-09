@@ -11,7 +11,7 @@ if (isset($_GET['search'])) {
     if (isset($_GET['word'])) {
         $word = htmlspecialchars(trim($_GET['word']));
     } else
-        header('Location: index.php');
+        header('Location: admin.php');
 
     $in = $_GET['in'] ?? false;
     $cat = $_GET['cat'] ?? false;
@@ -60,7 +60,7 @@ if (isset($_GET['search'])) {
     $posts = $posts->get();
 
 } else
-    header('location: index.php');
+    header('location: admin.php');
 
 $url = 'search.php?';
 ?>

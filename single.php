@@ -16,9 +16,9 @@ if (isset($_GET['id'])) {
 if (isset($id))
     $post = Post::find($id);
 else
-    header('Location: index.php');
+    header('Location: admin.php');
 if (!$post)
-    header('Location: index.php');
+    header('Location: admin.php');
 
 $user_ip = $_SERVER['REMOTE_ADDR'];
 $views = \Wlog\Model\View::where([['post_id', $id], ['user_ip', $user_ip]])->first();
@@ -184,7 +184,7 @@ if (isset($_GET['cLike']) || isset($_GET['de-cLike'])) {
                                 <?php if (isset($_GET['like'])): if ($_GET['like'] == 'empty'): ?>
                                     <div style="color: red; margin-top: 20px">
                                         برای لایک ابتدا وارد شوید!
-                                        <a href="auth.php" class="btn btn-danger">ورود</a>
+                                        <a href="login.php" class="btn btn-danger">ورود</a>
                                     </div>
                                 <?php endif; ?>
                                 <?php endif; ?>
@@ -220,21 +220,21 @@ if (isset($_GET['cLike']) || isset($_GET['de-cLike'])) {
                     <?php if (isset($_GET['user'])): if ($_GET['user'] == 'empty'): ?>
                         <div style="color: red; margin-top: 20px">
                             برای ایجاد کامنت ابتدا وارد شوید!
-                            <a href="auth.php" class="btn btn-danger">ورود</a>
+                            <a href="login.php" class="btn btn-danger">ورود</a>
                         </div>
                     <?php endif; ?>
                     <?php endif; ?>
                         <?php if (isset($_GET['cLike'])): if ($_GET['cLike'] == 'empty'): ?>
                             <div style="color: red; margin-top: 20px">
                                 برای لایک کامنت ابتدا وارد شوید!
-                                <a href="auth.php" class="btn btn-danger">ورود</a>
+                                <a href="login.php" class="btn btn-danger">ورود</a>
                             </div>
                         <?php endif; ?>
                         <?php endif; ?>
                         <?php if (isset($_GET['reply'])): if ($_GET['reply'] == 'empty'): ?>
                             <div style="color: red; margin-top: 20px">
                                 برای پاسخ به کامنت ابتدا وارد شوید!
-                                <a href="auth.php" class="btn btn-danger">ورود</a>
+                                <a href="login.php" class="btn btn-danger">ورود</a>
                             </div>
                         <?php endif; ?>
                         <?php endif; ?>

@@ -34,9 +34,9 @@
     </div>
     <div style="margin-left: 20px">
         <?php if (isset($_SESSION['user_id'])): ?>
-        <a class="btn btn-primary" style="color: white" href="auth.php">داشبورد</a>
+        <a class="btn btn-primary" style="color: white" href="./panel/">داشبورد</a>
         <?php else: ?>
-        <a class="btn btn-primary" style="color: white" href="auth.php">ورود</a>
+        <a class="btn btn-primary" style="color: white" href="login.php">ورود</a>
         <?php endif; ?>
     </div>
     <div class="blog_top_search">

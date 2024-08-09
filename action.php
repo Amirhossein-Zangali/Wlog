@@ -48,17 +48,17 @@ if (isset($_POST['signup'])) {
     $email = checkInput($_POST['email']);
 
     if (empty($name) || empty($username) || empty($password) || empty($email)) {
-        header('location: auth.php?err=empty');
+        header('location: register.php?err=empty');
     }else{
         $findUser = \Wlog\Model\User::where('username', $username)->orWhere('email', $email)->count();
         if ($findUser){
-            header('location: auth.php?err=exist');
+            header('location: register.php?err=exist');
         } else {
             $user = new \Wlog\Model\User();
             $user->name = $name;
             $user->username = $username;
-            $user->password = password_hash($password, PASSWORD_DEFAULT);
             $user->email = $email;
+            $user->password = password_hash($password, PASSWORD_DEFAULT);
             $user->save();
         }
 
@@ -67,7 +67,7 @@ if (isset($_POST['signup'])) {
             header('location: index.php');
         }else {
             $_SESSION['err'] = $user;
-            header('location: auth.php?err=' . $user);
+            header('location: register.php?err=' . $user);
         }
     }
 }
@@ -75,7 +75,7 @@ if (isset($_POST['signin'])) {
     $username = checkInput($_POST['username']);
     $password = checkInput($_POST['password']);
     if (empty($username) || empty($password)) {
-        header('location: auth.php?err=empty');
+        header('location: login.php?err=empty');
     } else {
         $user = \Wlog\Model\User::where('username' , $username)->first();
         $findUser = false;
@@ -86,7 +86,7 @@ if (isset($_POST['signin'])) {
             header('location: index.php');
         } else {
             $_SESSION['err'] = $user->id;
-            header('location: auth.php?err=notFindUser');
+            header('location: login.php?err=notFindUser');
         }
     }
 }

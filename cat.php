@@ -13,7 +13,7 @@ if (isset($_GET['id'])){
     }
 }
 if (!isset($id))
-    header('Location: index.php');
+    header('Location: admin.php');
 
 ?>
 <!DOCTYPE html>
@@ -40,7 +40,7 @@ if (!isset($id))
     <?php include_once 'nav.php';
     $category = Category::find($id);
     if (!$category)
-        header('Location: index.php');
+        header('Location: admin.php');
     ?>
     <div class="blog_breadcrumb_wrapper" style="margin-top: 90px">
         <div class="container justify-content-center align-items-center">
