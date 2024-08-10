@@ -243,7 +243,7 @@ if (isset($_GET['cLike']) || isset($_GET['de-cLike'])) {
                         <h3 class="wow fadeInUp">کامنت ها
                             <span>(<?= count($comments) ?>)</span></h3>
                         <ol class="comment-list">
-                            <?php foreach ($comments as $comment): if ($comment->reply == 0): $subComments = Comment::where('reply', $comment->id)->get(); ?>
+                            <?php foreach ($comments as $comment): if ($comment->reply == 0): $subComments = Comment::where([['reply', $comment->id], ['status', 1]])->get(); ?>
                                 <li class="wow fadeInUp">
                                     <div class="blog_comment">
                                         <div class="blog_comment_img">
@@ -298,7 +298,7 @@ if (isset($_GET['cLike']) || isset($_GET['de-cLike'])) {
                                     </div>
                                     <?php if (count($subComments)): ?>
                                         <ul class="children">
-                                            <?php foreach ($subComments as $subComment): $threeSubComments = Comment::where('reply', $subComment->id)->get(); ?>
+                                            <?php foreach ($subComments as $subComment): $threeSubComments = Comment::where([['reply', $subComment->id], ['status', 1]])->get(); ?>
                                                 <li class="wow fadeInUp">
                                                     <div class="blog_comment">
                                                         <div class="blog_comment_img">
