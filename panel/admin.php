@@ -8,6 +8,14 @@ if (isset($_SESSION['user_id']))
     $user = \Wlog\Model\User::find($_SESSION['user_id']);
 else
     header("location:./index.php");
+
+if (isset($_GET['logout'])) {
+    unset($_SESSION['user_id']);
+    header('location:./../index.php');
+}
+
+if ($user->role != 'admin')
+    header("location:./index.php");
 if (isset($_GET['page'])) {
     if ($_GET['page'] == 'user' || $_GET['page'] == 'post' || $_GET['page'] == 'category' || $_GET['page'] == 'comment')
         $page = $_GET['page'];
@@ -48,6 +56,11 @@ if (isset($_POST['edit']) && $_POST['table'] == 'user' && $_POST['role'] == 'adm
         $result->name = $name;
         $result->username = $username;
         $result->email = $email;
+        if (isset($_POST['role']))
+            $result->role = $_POST['role'];
+        if (isset($_POST['acc_lvl']))
+            $result->acc_lvl = $_POST['acc_lvl'];
+
     }
     if ($_POST['table'] == 'post') {
         $user_id = trim($_POST['user_id']);
@@ -78,7 +91,6 @@ if (isset($_POST['edit']) && $_POST['table'] == 'user' && $_POST['role'] == 'adm
         $result->name = $name;
         $result->subcat_id = $sub_cat_id;
     }
-
     $result->update();
     header('location: ./admin.php?page=' . $_POST['table']);
 }
@@ -97,6 +109,25 @@ if (isset($_POST['reply']) && isset($_POST['table']) && $_POST['table'] == 'comm
     $result->status = 1;
     $result->save();
     header('location: ./admin.php?page=' . $_POST['table']);
+}
+
+if (isset($_GET['approve']) || isset($_GET['reject'])) {
+    if ($_GET['approve']) {
+        $comment_id = $_GET['approve'];
+        $status = 1;
+    }
+    else if ($_GET['reject']){
+        $comment_id = $_GET['reject'];
+        $status = -1;
+    }
+    $comment = Comment::find($comment_id);
+    if ($comment)
+    {
+        $comment->status = $status;
+        $comment->update();
+    }
+
+    header('location: ./admin.php?page=comment');
 }
 
 if (isset($_POST['add'])) {
@@ -360,6 +391,38 @@ if (isset($_GET['delete']) && isset($_GET['page'])) {
                                                                class="form-control" id="exampleInputPassword1"
                                                                placeholder="ایمیل را وارد کنید">
                                                     </div>
+                                                    <div class="form-group">
+                                                        <label for="exampleInputEmail1">نقش</label>
+                                                        <select class="form-control" name="role">
+                                                            <option
+                                                                <?= $edit_user && $edit_user->role == 'user' ? 'selected' : '' ?>value="user">
+                                                                کاربر
+                                                            </option>
+                                                            <option
+                                                                <?= $edit_user && $edit_user->role == 'writer' ? 'selected' : '' ?> value="writer">
+                                                                نویسنده
+                                                            </option>
+                                                            <option
+                                                                <?= $edit_user && $edit_user->role == 'admin' ? 'selected' : '' ?> value="admin">
+                                                                ادمین
+                                                            </option>
+                                                        </select>
+                                                    </div>
+                                                    <?php if ($edit_user->role == 'writer'): ?>
+                                                    <div class="form-group">
+                                                        <label for="exampleInputEmail1">دسترسی</label>
+                                                        <select class="form-control" name="acc_lvl">
+                                                            <option
+                                                                <?= $edit_user && $edit_user->acc_lvl == 0 ? 'selected' : '' ?>value="0">
+                                                                بسته
+                                                            </option>
+                                                            <option
+                                                                <?= $edit_user && $edit_user->acc_lvl > 0 ? 'selected' : '' ?> value="1">
+                                                                آزاد
+                                                            </option>
+                                                        </select>
+                                                    </div>
+                                                    <?php endif; ?>
                                                 </div>
                                                 <!-- /.card-body -->
 
@@ -446,6 +509,7 @@ if (isset($_GET['delete']) && isset($_GET['page'])) {
                                         <?php endif; ?>
                                     <?php endif; ?>
                                 </div>
+                                <a href="excel_export.php" class="btn btn-primary">خروجی اکسل (excel) از تمام کاربران</a>
                             </div>
                         </div>
                     <?php elseif ($page == 'post'): ?>
@@ -665,7 +729,7 @@ if (isset($_GET['delete']) && isset($_GET['page'])) {
                                                             <td><?= $post->view ?></td>
                                                             <td><?= \Wlog\Model\PostLike::where('post_id', $post->id)->count() ?></td>
                                                             <td><?= \Wlog\Model\Comment::where('post_id', $post->id)->count() ?></td>
-                                                            <td><?= mb_substr($post->des, 0, 40) . '...' ?></td>
+                                                            <td><?= mb_substr($post->des, 0, 20) . '...' ?></td>
                                                             <td><?= jdate('Y-m-d', strtotime($post->created_at)) ?></td>
                                                             <td>
                                                                 <a href="<?= get_url('edit') . 'edit=' . $post->id ?>"
@@ -774,6 +838,7 @@ if (isset($_GET['delete']) && isset($_GET['page'])) {
                                                     <th><?= $category_count ?></th>
                                                     <th>نام</th>
                                                     <th>زیر دسته بندی</th>
+                                                    <th>تعداد پست</th>
                                                     <th>تاریخ ایجاد</th>
                                                     <th>عملیات</th>
                                                 </tr>
@@ -784,6 +849,7 @@ if (isset($_GET['delete']) && isset($_GET['page'])) {
                                                         <td><span class="badge badge-<?= $category->subcat_id > 0 ? 'danger' : 'primary' ?>">
                                                         <?= $category->subcat_id > 0 ? \Wlog\Model\Category::find($category->subcat_id)->name : 'اصلی' ?>
                                                     </span></td>
+                                                        <td><a class="badge badge-primary px-2" href="../cat.php?id=<?= $category->id ?>"><?= Post::where('category_id', $category->id)->count(); ?></a></td>
                                                         <td><?= jdate('Y-m-d', strtotime($category->created_at)) ?></td>
                                                         <td>
                                                             <a href="<?= get_url('edit') . 'edit=' . $category->id ?>"
@@ -951,45 +1017,56 @@ if (isset($_GET['delete']) && isset($_GET['page'])) {
                                                         <th>متن</th>
                                                         <th>پاسخ</th>
                                                         <th>تاریخ ایجاد</th>
+                                                        <th>وضعیت</th>
                                                         <th>عملیات</th>
                                                     </tr>
-                                                    <?php foreach ($comments as $index => $comment): ?>
+                                                    <?php
+                                                    $is_tree_sub_comments = [];
+                                                    foreach ($comments as $comment) {
+                                                        $sub_comments = \Wlog\Model\Comment::where('reply', $comment->id)->get();
+                                                        if ($sub_comments->isNotEmpty()) {
+                                                            foreach ($sub_comments as $sub_comment) {
+                                                                $tree_sub_comments = (\Wlog\Model\Comment::where('reply', $sub_comment->id));
+                                                                if ($tree_sub_comments->count() > 0) {
+                                                                    $is_tree_sub_comments[] = ($tree_sub_comments->get())[0]->id;
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                    foreach ($comments as $index => $comment):?>
                                                         <tr>
                                                             <td><?= isset($_GET['index']) ? 5 * ($_GET['index'] - 1) + ($index + 1) : $index + 1 ?></td>
                                                             <td><?= \Wlog\Model\User::find($comment->user_id)->username ?></td>
                                                             <td><?php $comment_post = Post::find($comment->post_id); ?>
-                                                                <a href="../single.php?id=<?= $comment_post->id ?>"
+                                                                <a target="_blank"
+                                                                   href="../single.php?id=<?= $comment_post->id ?>"
                                                                    style="color: black">
-                                                                    <?= mb_substr(explode(':', $comment_post->title)[0], 0, 100) ?>
+                                                                    <?= mb_substr(explode(':', $comment_post->title)[0], 0, 50) ?>
                                                                 </a>
                                                             </td>
-                                                            <td><?= mb_substr($comment->content, 0, 50) . '...' ?></td>
+                                                            <td><?= mb_substr($comment->content, 0, 10) . '...' ?></td>
                                                             <td><?= $comment->reply > 0 ? \Wlog\Model\User::find(\Wlog\Model\Comment::find($comment->reply)->user_id)->username : 'اصلی' ?></td>
                                                             <td><?= jdate('Y-m-d', strtotime($comment->created_at)) ?></td>
+                                                            <?php if ($comment->status == 1): ?>
+                                                                <td><a class="btn btn-success text-white" href="<?= get_url('reject') . 'reject=' . $comment->id ?>">تایید شده</a></td>
+                                                            <?php elseif ($comment->status == -1): ?>
+                                                                <td><a class="btn btn-danger" href="<?= get_url('approve') . 'approve=' . $comment->id ?>">رد شده</a></td>
+                                                            <?php elseif ($comment->status == 0): ?>
+                                                                <td>
+                                                                    <a class="btn btn-success" href="<?= get_url('approve') . 'approve=' . $comment->id ?>">تایید</a>
+                                                                    <a class="btn btn-danger" href="<?= get_url('reject') . 'reject=' . $comment->id ?>">رد</a>
+                                                                </td>
+                                                            <?php endif; ?>
                                                             <td>
-                                                                <?php
-                                                                $has_tree_sub_comment = false;
-                                                                $sub_comment = \Wlog\Model\Comment::where('reply', $comment->id);
-                                                                if (count($sub_comment->get()) > 0) {
-                                                                    $three_sub_comment = [];
-                                                                    foreach ($sub_comment->get() as $s_comment) {
-                                                                        $three_sub_comment[] = \Wlog\Model\Comment::where('reply', $s_comment->id)->get();
-                                                                        if (count($three_sub_comment) > 0) {
-                                                                            foreach ($three_sub_comment[0] as $ts_comment) {
-                                                                                $has_tree_sub_comment = true;
-                                                                            }
-                                                                        }
-                                                                    }
-                                                                }
-                                                                ?>
-                                                                <?php if (!$has_tree_sub_comment): ?>
+                                                                <?php if (!in_array($comment->id, $is_tree_sub_comments)): ?>
                                                                     <a href="<?= get_url('reply') . "reply=$comment->id" ?>"
                                                                        class="btn btn-success">پاسخ</a>
+                                                                <?php else: ?>
+                                                                    <span class="btn btn-secondary text-white">پاسخ</span>
                                                                 <?php endif; ?>
                                                                 <a href="<?= get_url('delete') . 'delete=' . $comment->id ?>"
-                                                                   class="btn btn-danger <?= $has_tree_sub_comment ? 'btn-block' : '' ?>">حذف</a>
+                                                                   class="btn btn-danger">حذف</a>
                                                             </td>
-
                                                         </tr>
                                                     <?php endforeach; ?>
                                                 </table>

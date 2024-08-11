@@ -56,7 +56,7 @@ if (isset($_GET['like']) || isset($_GET['de-like'])) {
                 $de_like->delete();
             header('Location: single.php?id=' . $_GET['id']);
         }
-    if ($like || $de_like)
+    if (@$like || @$de_like)
         header('location: single.php?id=' . $_GET['id']);
 }
 if (isset($_GET['cLike']) || isset($_GET['de-cLike'])) {
