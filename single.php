@@ -16,9 +16,9 @@ if (isset($_GET['id'])) {
 if (isset($id))
     $post = Post::find($id);
 else
-    header('Location: admin.php');
+    header('Location: index.php');
 if (!$post)
-    header('Location: admin.php');
+    header('Location: index.php');
 
 $user_ip = $_SERVER['REMOTE_ADDR'];
 $views = \Wlog\Model\View::where([['post_id', $id], ['user_ip', $user_ip]])->first();
